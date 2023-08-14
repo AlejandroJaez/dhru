@@ -9,9 +9,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	err := godotenv.Load(".env.test")
+	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env.test file")
+		log.Fatal("Error loading .env file")
 	}
 	// call flag.Parse() here if TestMain uses flags
 	os.Exit(m.Run())
