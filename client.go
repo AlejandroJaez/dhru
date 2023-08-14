@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type AccountInfo struct {
@@ -19,7 +20,16 @@ type AccountInfo struct {
 	Currency  string
 }
 
-func call(serverUrl string, username string, apikey string, action string) (*http.Response, error) {
+func call(serverUrl string, username string, apikey string, action string) (gjson.Result, error) {
+	//parsedURL, err := url.ParseRequestURI(serverUrl)
+	//if parsedURL.Scheme != "https" && parsedURL.Scheme != "http" {
+	//	return gjson.Result{}, errors.New(fmt.Sprintf("invalid url: %s", parsedURL.String()))
+	//}
+
+	//if err != nil {
+	//	return gjson.Result{}, err
+	//}
+
 	data := url.Values{
 		"username":      {username},
 		"apiaccesskey":  {apikey},
@@ -27,37 +37,47 @@ func call(serverUrl string, username string, apikey string, action string) (*htt
 		"action":        {action},
 	}
 
-	response, err := http.PostForm(serverUrl, data)
-
-	if err != nil || response.StatusCode != 200 {
+	//response, err := http.PostForm(serverUrl, data)
+	client := &http.Client{}
+	request, err := http.NewRequest(http.MethodPost, serverUrl, strings.NewReader(data.Encode()))
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	response, err := client.Do(request)
+	if err != nil {
+		return gjson.Result{}, err
+	}
+	if response.StatusCode != 200 {
 		switch response.StatusCode {
 		case 404:
-			return response, errors.New(fmt.Sprintf("StatusCode=404, %s not found", serverUrl))
+			return gjson.Result{}, errors.New(fmt.Sprintf("StatusCode=404, %s not found", serverUrl))
 		default:
-			return response, errors.New(fmt.Sprintf("StatusCode=%d, %s not found", response.StatusCode, response.Status))
+			return gjson.Result{}, errors.New(fmt.Sprintf("StatusCode=%d, %s not found", response.StatusCode, response.Status))
 		}
 	}
-	return response, err
+
+	bodyResponse, err := io.ReadAll(response.Body)
+	if err != nil {
+		return gjson.Result{}, err
+	}
+
+	filteredJSON := gjson.Get(string(bodyResponse), "SUCCESS.0")
+	if filteredJSON.Type != gjson.JSON {
+		errorJSON := gjson.Get(string(bodyResponse), "ERROR.0.MESSAGE")
+		return errorJSON, errors.New(errorJSON.Str)
+	}
+	return filteredJSON, err
 }
 
 func GetAccountInfo(serverUrl string, username string, apikey string) (AccountInfo, error) {
 	var accountInfo AccountInfo
 	var err error
-	response, err := call(serverUrl, username, apikey, "accountinfo")
-	if err != nil {
-		return AccountInfo{}, err
-	}
-	bodyResponse, err := io.ReadAll(response.Body)
-	if err != nil {
-		return AccountInfo{}, err
-	}
 
-	filteredJSON := gjson.Get(string(bodyResponse), "SUCCESS.0.AccountInfo")
-	if filteredJSON.Type != gjson.JSON {
-		errorJSON := gjson.Get(string(bodyResponse), "ERROR.0.MESSAGE")
-		return accountInfo, errors.New(errorJSON.Str)
+	SuccessJSON, err := call(serverUrl, username, apikey, "accountinfo")
+	if err != nil {
+		return AccountInfo{}, err
 	}
-	err = json.NewDecoder(bytes.NewReader([]byte(filteredJSON.Raw))).Decode(&accountInfo)
+	accountJson := gjson.Get(SuccessJSON.Raw, "AccountInfo")
+
+	err = json.NewDecoder(bytes.NewReader([]byte(accountJson.Raw))).Decode(&accountInfo)
 	if err != nil {
 		return AccountInfo{}, err
 	}
