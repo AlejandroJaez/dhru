@@ -10,14 +10,33 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
+type StringToFloat float64
+
 type AccountInfo struct {
 	Credit    string
-	Creditraw string
+	Creditraw StringToFloat
 	Mail      string
 	Currency  string
+}
+
+func (foe *StringToFloat) UnmarshalJSON(data []byte) error {
+	if string(data) == "\"\"" {
+		if foe != nil {
+			*foe = 0
+		}
+		return nil
+	}
+	num := strings.ReplaceAll(string(data), "\"", "")
+	n, err := strconv.ParseFloat(num, 64)
+	if err != nil {
+		return err
+	}
+	*foe = StringToFloat(n)
+	return nil
 }
 
 func call(serverUrl string, username string, apikey string, action string) (gjson.Result, error) {
@@ -41,6 +60,7 @@ func call(serverUrl string, username string, apikey string, action string) (gjso
 	client := &http.Client{}
 	request, err := http.NewRequest(http.MethodPost, serverUrl, strings.NewReader(data.Encode()))
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Add("Accept", "application/json")
 	response, err := client.Do(request)
 	if err != nil {
 		return gjson.Result{}, err
