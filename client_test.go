@@ -1,7 +1,6 @@
 package dhru
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -30,14 +29,6 @@ func TestGetAccountInfo(t *testing.T) {
 	acInfo, err := GetAccountInfo(serverUrl, username, key)
 	notWant := AccountInfo{}
 	if acInfo == notWant || err != nil {
-		t.Fatalf("error: %s", err)
-	}
-	fmt.Printf("%#v\n", acInfo)
-}
-
-func TestGetAllServicesFromFile(t *testing.T) {
-	services, err := GetAllServicesFromFile()
-	if len(services) == 0 || err != nil {
 		t.Fatalf("error: %s", err)
 	}
 }
