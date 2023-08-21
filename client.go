@@ -10,18 +10,12 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 )
 
 type StringToFloat float64
-
-type AccountInfo struct {
-	Credit    string
-	Creditraw StringToFloat
-	Mail      string
-	Currency  string
-}
 
 func (foe *StringToFloat) UnmarshalJSON(data []byte) error {
 	if string(data) == "\"\"" {
@@ -104,4 +98,82 @@ func GetAccountInfo(serverUrl string, username string, apikey string) (AccountIn
 	slog.Debug("", "accountInfo", accountInfo)
 
 	return accountInfo, err
+}
+
+func PlaceSingleOrder(serverUrl string, username string, apikey string) {
+
+}
+
+func keyExists(decoded map[string]interface{}, key string) bool {
+	val, ok := decoded[key]
+	return ok && val != nil
+}
+
+func GetAllServicesFromFile() ([]ServiceGroup, error) {
+	var groupsMap map[string]interface{}
+	jsonServicesFile, err := os.ReadFile("services.json")
+	if err != nil {
+		return nil, err
+	}
+	if !gjson.Valid(string(jsonServicesFile)) {
+		return nil, errors.New("error in json file")
+	}
+
+	value := gjson.Get(string(jsonServicesFile), "SUCCESS.0.LIST")
+	err = json.NewDecoder(bytes.NewReader([]byte(value.Raw))).Decode(&groupsMap)
+	if err != nil {
+		return nil, err
+	}
+	groupSlice := make([]ServiceGroup, 0, len(groupsMap))
+
+	for _, group := range groupsMap {
+		servicesMap := group.(map[string]interface{})["SERVICES"].(map[string]interface{})
+		serviceSlice := make([]Service, 0, len(servicesMap))
+		for _, service := range servicesMap {
+			serviceMap := service.(map[string]interface{})
+
+			var customField map[string]string
+			if keyExists(serviceMap, "CUSTOM") {
+				customField = serviceMap["CUSTOM"].(map[string]string)
+			}
+
+			serviceSlice = append(serviceSlice, Service{
+				ServiceId:   0,
+				ServiceType: serviceMap["SERVICETYPE"].(string),
+				Qnt:         serviceMap["QNT"].(string),
+				Server:      serviceMap["SERVER"].(string),
+				MinQnt:      serviceMap["MINQNT"].(string),
+				MaxQnt:      serviceMap["MAXQNT"].(string),
+				Custom:      customField,
+				ServiceName: serviceMap["SERVICENAME"].(string),
+				Credit:      serviceMap["CREDIT"].(string),
+				Time:        serviceMap["TIME"].(string),
+				Info:        serviceMap["INFO"].(string),
+			})
+		}
+		groupSlice = append(groupSlice, ServiceGroup{
+			GroupName: group.(map[string]interface{})["GROUPNAME"].(string),
+			GroupType: group.(map[string]interface{})["GROUPTYPE"].(string),
+			Services:  serviceSlice,
+		})
+
+	}
+
+	return groupSlice, nil
+}
+
+func GetAllServices() (map[string]serviceGroupUnmarshall, error) {
+	var services map[string]serviceGroupUnmarshall
+
+	jsonServicesFile, err := os.ReadFile("services.json")
+	if !gjson.Valid(string(jsonServicesFile)) {
+		println("Error in json file")
+	}
+	value := gjson.Get(string(jsonServicesFile), "SUCCESS.0.LIST")
+	err = json.NewDecoder(bytes.NewReader([]byte(value.Raw))).Decode(&services)
+	if err != nil {
+		return nil, err
+	}
+
+	return services, nil
 }
