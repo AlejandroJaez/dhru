@@ -1,11 +1,12 @@
 package dhru_test
 
 import (
-	"dhru"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"testing"
+
+	"dhru"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -15,8 +16,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	err := godotenv.Load(".env")
-	if err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 	// call flag.Parse() here if TestMain uses flags

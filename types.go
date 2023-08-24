@@ -1,6 +1,7 @@
 package dhru
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -24,7 +25,7 @@ func (foe *StringToFloat) UnmarshalJSON(data []byte) error {
 	num := strings.ReplaceAll(string(data), "\"", "")
 	n, err := strconv.ParseFloat(num, 64)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s", err)
 	}
 	*foe = StringToFloat(n)
 	return nil
