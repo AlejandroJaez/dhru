@@ -1,6 +1,7 @@
-package dhru
+package dhru_test
 
 import (
+	"dhru"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -8,7 +9,7 @@ import (
 )
 
 var (
-	serverUrl string
+	serverURL string
 	username  string
 	key       string
 )
@@ -19,22 +20,24 @@ func TestMain(m *testing.M) {
 		log.Fatal("Error loading .env file")
 	}
 	// call flag.Parse() here if TestMain uses flags
-	serverUrl = os.Getenv("DHRU_SERVER_URL")
+	serverURL = os.Getenv("DHRU_SERVER_URL")
 	username = os.Getenv("DHRU_USERNAME")
 	key = os.Getenv("DHRU_API_KEY")
 	os.Exit(m.Run())
 }
 
 func TestGetAccountInfo(t *testing.T) {
-	acInfo, err := GetAccountInfo(serverUrl, username, key)
-	notWant := AccountInfo{}
+	t.Parallel()
+	acInfo, err := dhru.GetAccountInfo(serverURL, username, key)
+	notWant := dhru.AccountInfo{}
 	if acInfo == notWant || err != nil {
 		t.Fatalf("error: %s", err)
 	}
 }
 
 func TestGetAllServices(t *testing.T) {
-	services, err := GetAllServices()
+	t.Parallel()
+	services, err := dhru.GetAllServices()
 	if len(services) == 0 || err != nil {
 		t.Fatalf("error: %s", err)
 	}

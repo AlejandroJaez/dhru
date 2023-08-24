@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+type StringToFloat float64
+
 type AccountInfo struct {
 	Credit    string
 	Creditraw StringToFloat
@@ -29,7 +31,7 @@ func (foe *StringToFloat) UnmarshalJSON(data []byte) error {
 }
 
 type Service struct {
-	ServiceId   int               `json:"SERVICEID"`
+	ServiceID   int               `json:"SERVICEID"`
 	ServiceType string            `json:"SERVICETYPE"`
 	Qnt         string            `json:"QNT"`
 	Server      string            `json:"SERVER"`
@@ -42,7 +44,7 @@ type Service struct {
 	Info        string            `json:"INFO"`
 }
 
-type serviceGroup struct {
+type ServiceGroup struct {
 	GroupName string             `json:"GROUPNAME"`
 	GroupType string             `json:"GROUPTYPE"`
 	Services  map[string]Service `json:"SERVICES"`
