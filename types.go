@@ -15,6 +15,12 @@ type AccountInfo struct {
 	Currency  string
 }
 
+type Credentials struct {
+	ServerURL string
+	Username  string
+	ApiKey    string
+}
+
 func (foe *StringToFloat) UnmarshalJSON(data []byte) error {
 	if string(data) == "\"\"" {
 		if foe != nil {
