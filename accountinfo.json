@@ -1,0 +1,14 @@
+{
+  "SUCCESS": [
+    {
+      "message": "Your Account Info",
+      "AccountInfo": {
+        "credit": "$155.15 USD",
+        "creditraw": "155.150",
+        "mail": "emailexample@domain.com",
+        "currency": "USD"
+      }
+    }
+  ],
+  "apiversion": "8.1"
+}
