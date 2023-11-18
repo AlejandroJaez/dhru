@@ -8,7 +8,7 @@ import (
 
 type StringToFloat float64
 
-type AccountInfo struct {
+type DrhuAccount struct {
 	Credit    string
 	Creditraw StringToFloat
 	Mail      string

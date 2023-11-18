@@ -94,21 +94,21 @@ func request(serverURL string, username string, apikey string, action string) (g
 	return JSONSuccess, err
 }
 
-func GetAccountInfo(serverUrl string, username string, apikey string) (AccountInfo, error) {
-	var accountInfo AccountInfo
+func AccountInfo(serverUrl string, username string, apikey string) (DrhuAccount, error) {
+	var accountInfo DrhuAccount
 	responseJSON, err := request(serverUrl, username, apikey, "accountinfo")
 	if err != nil {
-		return AccountInfo{}, err
+		return DrhuAccount{}, err
 	}
 	accountJSON := gjson.Get(responseJSON.Raw, "AccountInfo")
 	err = json.NewDecoder(bytes.NewReader([]byte(accountJSON.Raw))).Decode(&accountInfo)
 	if err != nil {
-		return AccountInfo{}, fmt.Errorf("%s", err)
+		return DrhuAccount{}, fmt.Errorf("%s", err)
 	}
 	return accountInfo, err
 }
 
-func GetAllServices(serverUrl string, username string, apikey string) (map[string]ServiceGroup, error) {
+func Services(serverUrl string, username string, apikey string) (map[string]ServiceGroup, error) {
 	var services map[string]ServiceGroup
 	responseJSON, err := request(serverUrl, username, apikey, "imeiservicelist")
 	if err != nil {
