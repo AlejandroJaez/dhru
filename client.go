@@ -70,7 +70,7 @@ func request(serverURL string, username string, apikey string, action string) (g
 		return gjson.Result{}, fmt.Errorf("%s", err)
 	}
 	if !gjson.Valid(string(bodyResponse)) {
-		return gjson.Result{}, fmt.Errorf("invalid json response: %q", bodyResponse)
+		return gjson.Result{}, fmt.Errorf("response from remote server is not a valid json: %q", bodyResponse)
 	}
 
 	JSONSuccess = gjson.Get(string(bodyResponse), "SUCCESS.0")
