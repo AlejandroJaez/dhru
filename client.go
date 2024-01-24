@@ -15,10 +15,8 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func request(serverURL string, username string, apikey string, action string) (gjson.Result, error) {
+func debugRequest(action string) (gjson.Result, error) {
 	var JSONSuccess gjson.Result
-
-	// if debug load the cache file and return
 	value, debug := os.LookupEnv("DHRU_DEBUG")
 	if debug == true && value == "TRUE" {
 		fileInfo, err := os.Stat(fmt.Sprintf("%s.json", action))
@@ -28,6 +26,11 @@ func request(serverURL string, username string, apikey string, action string) (g
 			return JSONSuccess, nil
 		}
 	}
+	return JSONSuccess, nil
+}
+
+func request(serverURL string, username string, apikey string, action string) (gjson.Result, error) {
+	var JSONSuccess gjson.Result
 
 	// if not debug, call the api
 	client := &http.Client{}
@@ -67,7 +70,7 @@ func request(serverURL string, username string, apikey string, action string) (g
 		return gjson.Result{}, fmt.Errorf("%s", err)
 	}
 	if !gjson.Valid(string(bodyResponse)) {
-		return gjson.Result{}, fmt.Errorf("invalid json response")
+		return gjson.Result{}, fmt.Errorf("invalid json response: %q", bodyResponse)
 	}
 
 	JSONSuccess = gjson.Get(string(bodyResponse), "SUCCESS.0")
@@ -79,18 +82,6 @@ func request(serverURL string, username string, apikey string, action string) (g
 		return gjson.Result{}, errors.New(errorJSON.Str)
 	}
 
-	//if debug save response to file
-	if debug == true && value == "TRUE" {
-		file, err := os.Create(fmt.Sprintf("%s.json", action))
-		if err != nil {
-			return gjson.Result{}, fmt.Errorf("%s", err)
-		}
-		_, err = file.WriteString(string(bodyResponse))
-		if err != nil {
-			return gjson.Result{}, fmt.Errorf("%s", err)
-		}
-
-	}
 	return JSONSuccess, err
 }
 
