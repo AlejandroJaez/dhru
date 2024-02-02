@@ -65,6 +65,7 @@ func dhruApiRequest(dhruServer Server, action Action) (ApiResponse, error) {
 	return apiResponse, nil
 }
 
+// GetAccountInfo to get info
 func GetAccountInfo(server Server) (DrhuAccount, error) {
 	// Make the API request
 	apiResponse, err := dhruApiRequest(server, ActionAccountInfo)
