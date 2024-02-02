@@ -56,3 +56,22 @@ type ServiceGroup struct {
 	GroupType string             `json:"GROUPTYPE"`
 	Services  map[string]Service `json:"SERVICES"`
 }
+
+type ApiResponse struct {
+	Success []struct {
+		Message     string `json:"MESSAGE"`
+		List        map[string]ServiceGroup
+		AccountInfo DrhuAccount `json:"AccountInfo"`
+	} `json:"SUCCESS"`
+	Error []struct {
+		Message string `json:"MESSAGE"`
+	} `json:"ERROR"`
+}
+
+type Server struct {
+	Url       string
+	Username  string
+	SecretKey string
+}
+
+type Action string
