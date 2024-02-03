@@ -66,7 +66,7 @@ func GetServices(server Server) (map[string]ServiceGroup, error) {
 }
 
 func PostImeiOrder(server Server, service int32, imei int64) (ApiResponse, error) {
-	if !isValidIMEI(strconv.FormatInt(imei, 10)) {
+	if !isValidIMEI(imei) {
 		return ApiResponse{}, errors.New("invalid imei")
 	}
 	parameters := Parameters{
