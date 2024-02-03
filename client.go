@@ -1,14 +1,16 @@
 package dhru
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
-func dhruApiRequest(dhruServer Server, action Action, extra map[string]string) (ApiResponse, error) {
+func dhruApiRequest(dhruServer Server, action Action, params Parameters) (ApiResponse, error) {
 	formData := url.Values{
 		"username":      {dhruServer.Username},
 		"apiaccesskey":  {dhruServer.SecretKey},
@@ -17,14 +19,11 @@ func dhruApiRequest(dhruServer Server, action Action, extra map[string]string) (
 	}
 
 	if action == ActionPlaceOrder {
-		if extra != nil {
-			xmlData, err := xml.Marshal(extra)
-			if err != nil {
-				return ApiResponse{}, err
-			}
-			formData.Add("parameters", string(xmlData))
+		xmlData, err := xml.Marshal(params)
+		if err != nil {
+			return ApiResponse{}, err
 		}
-
+		formData.Add("parameters", string(xmlData))
 	}
 
 	response, err := http.PostForm(dhruServer.Url, formData)
@@ -50,7 +49,7 @@ func dhruApiRequest(dhruServer Server, action Action, extra map[string]string) (
 }
 
 func GetAccountInfo(server Server) (DrhuAccount, error) {
-	apiResponse, err := dhruApiRequest(server, ActionAccountInfo, nil)
+	apiResponse, err := dhruApiRequest(server, ActionAccountInfo, Parameters{})
 	if err != nil {
 		return DrhuAccount{}, err
 	}
@@ -58,17 +57,22 @@ func GetAccountInfo(server Server) (DrhuAccount, error) {
 }
 
 func GetServices(server Server) (map[string]ServiceGroup, error) {
-	apiResponse, err := dhruApiRequest(server, ActionServiceList, nil)
+	apiResponse, err := dhruApiRequest(server, ActionServiceList, Parameters{})
 	if err != nil {
 		return nil, err
 	}
 	return apiResponse.Success[0].List, nil
 }
 
-func PostOrder(server Server) (DrhuAccount, error) {
-	apiResponse, err := dhruApiRequest(server, ActionPlaceOrder, nil)
-	if err != nil {
-		return DrhuAccount{}, err
+func PostImeiOrder(server Server, service int32, imei int64) (ApiResponse, error) {
+	parameters := Parameters{
+		IMEI:        strconv.FormatInt(imei, 10),
+		ID:          service,
+		CustomField: base64.StdEncoding.EncodeToString([]byte(`{"SERIAL_NUMBER":"SERIAL NUMBER"}`)),
 	}
-	return apiResponse.Success[0].AccountInfo, nil
+	apiResponse, err := dhruApiRequest(server, ActionPlaceOrder, parameters)
+	if err != nil {
+		return ApiResponse{}, err
+	}
+	return apiResponse, nil
 }

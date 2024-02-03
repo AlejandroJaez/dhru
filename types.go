@@ -1,6 +1,7 @@
 package dhru
 
 import (
+	"encoding/xml"
 	"fmt"
 	"strconv"
 	"strings"
@@ -75,3 +76,10 @@ type Server struct {
 }
 
 type Action string
+
+type Parameters struct {
+	XMLName     xml.Name `xml:"PARAMETERS"`
+	IMEI        string   `xml:"IMEI"`
+	ID          int32    `xml:"ID"`
+	CustomField string   `xml:"CUSTOMFIELD"`
+}
