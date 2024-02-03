@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"gopkg.in/errgo.v2/errors"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -65,6 +66,9 @@ func GetServices(server Server) (map[string]ServiceGroup, error) {
 }
 
 func PostImeiOrder(server Server, service int32, imei int64) (ApiResponse, error) {
+	if !isValidIMEI(strconv.FormatInt(imei, 10)) {
+		return ApiResponse{}, errors.New("invalid imei")
+	}
 	parameters := Parameters{
 		IMEI:        strconv.FormatInt(imei, 10),
 		ID:          service,
