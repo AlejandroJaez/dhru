@@ -72,7 +72,7 @@ func PostImeiOrder(server Server, service int32, imei int64) (ApiResponse, error
 	parameters := Parameters{
 		IMEI:        strconv.FormatInt(imei, 10),
 		ID:          service,
-		CustomField: base64.StdEncoding.EncodeToString([]byte(`{"SERIAL_NUMBER":"SERIAL NUMBER"}`)),
+		CustomField: base64.StdEncoding.EncodeToString([]byte(`{"":""}`)),
 	}
 	apiResponse, err := dhruApiRequest(server, ActionPlaceOrder, parameters)
 	if err != nil {
