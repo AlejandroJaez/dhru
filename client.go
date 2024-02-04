@@ -4,14 +4,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
-	"gopkg.in/errgo.v2/errors"
 	"net/http"
 	"net/url"
 	"strconv"
 )
 
-func dhruApiRequest(dhruServer Server, action Action, params Parameters) (ApiResponse, error) {
+func dhruApiRequest(dhruServer *Server, action Action, params Parameters) (ApiResponse, error) {
 	formData := url.Values{
 		"username":      {dhruServer.Username},
 		"apiaccesskey":  {dhruServer.SecretKey},
@@ -31,7 +31,6 @@ func dhruApiRequest(dhruServer Server, action Action, params Parameters) (ApiRes
 	if err != nil {
 		return ApiResponse{}, fmt.Errorf("error making request: %s", err)
 	}
-	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		return ApiResponse{}, fmt.Errorf("StatusCode=%d, %s:%s", response.StatusCode, http.StatusText(response.StatusCode), response.Body)
@@ -43,13 +42,17 @@ func dhruApiRequest(dhruServer Server, action Action, params Parameters) (ApiRes
 	}
 
 	if len(apiResponse.Error) > 0 {
-		return ApiResponse{}, fmt.Errorf("no success response in API response: %s", apiResponse.Error[0].Message)
+		return ApiResponse{}, fmt.Errorf("%s", apiResponse.Error[0].Message)
+	}
+
+	if err := response.Body.Close(); err != nil {
+		return ApiResponse{}, err
 	}
 
 	return apiResponse, nil
 }
 
-func GetAccountInfo(server Server) (DrhuAccount, error) {
+func GetAccountInfo(server *Server) (DrhuAccount, error) {
 	apiResponse, err := dhruApiRequest(server, ActionAccountInfo, Parameters{})
 	if err != nil {
 		return DrhuAccount{}, err
@@ -57,7 +60,7 @@ func GetAccountInfo(server Server) (DrhuAccount, error) {
 	return apiResponse.Success[0].AccountInfo, nil
 }
 
-func GetServices(server Server) (map[string]ServiceGroup, error) {
+func GetServices(server *Server) (map[string]ServiceGroup, error) {
 	apiResponse, err := dhruApiRequest(server, ActionServiceList, Parameters{})
 	if err != nil {
 		return nil, err
@@ -65,7 +68,7 @@ func GetServices(server Server) (map[string]ServiceGroup, error) {
 	return apiResponse.Success[0].List, nil
 }
 
-func PostImeiOrder(server Server, service int32, imei int64) (ApiResponse, error) {
+func PostImeiOrder(server *Server, service int32, imei int64) (ApiResponse, error) {
 	if !isValidIMEI(imei) {
 		return ApiResponse{}, errors.New("invalid imei")
 	}

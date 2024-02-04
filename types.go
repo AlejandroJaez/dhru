@@ -24,12 +24,10 @@ type Credentials struct {
 
 func (foe *StringToFloat) UnmarshalJSON(data []byte) error {
 	if string(data) == "\"\"" {
-		if foe != nil {
-			*foe = 0
-		}
+		*foe = 0
 		return nil
 	}
-	num := strings.ReplaceAll(string(data), "\"", "")
+	num := strings.Trim(string(data), "\"")
 	n, err := strconv.ParseFloat(num, 64)
 	if err != nil {
 		return fmt.Errorf("%s", err)

@@ -13,7 +13,7 @@ var credentials = dhru.Server{
 
 func TestServices(t *testing.T) {
 	t.Parallel()
-	list, err := dhru.GetServices(credentials)
+	list, err := dhru.GetServices(&credentials)
 	if err != nil && list != nil {
 		t.Fatalf("error: %s", err)
 	}
@@ -21,7 +21,7 @@ func TestServices(t *testing.T) {
 
 func TestAccountInfo(t *testing.T) {
 	t.Parallel()
-	account, err := dhru.GetAccountInfo(credentials)
+	account, err := dhru.GetAccountInfo(&credentials)
 	if err != nil && account != (dhru.DrhuAccount{}) {
 		t.Fatalf("error: %s", err)
 	}
@@ -29,7 +29,7 @@ func TestAccountInfo(t *testing.T) {
 
 func TestPostImeiOrder(t *testing.T) {
 	t.Parallel()
-	_, err := dhru.PostImeiOrder(credentials, 1, 105706261959171)
+	_, err := dhru.PostImeiOrder(&credentials, 1, 105706261959171)
 	if err != nil {
 		t.Fatalf("error: %s", err)
 	}
