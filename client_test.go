@@ -34,3 +34,10 @@ func TestPostImeiOrder(t *testing.T) {
 		t.Fatalf("error: %s", err)
 	}
 }
+
+func BenchmarkIsValidIMEI(b *testing.B) {
+	imei := int64(309777379750368)
+	for i := 0; i < b.N; i++ {
+		dhru.IsValidIMEI(imei)
+	}
+}

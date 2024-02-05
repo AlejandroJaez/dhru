@@ -69,7 +69,7 @@ func GetServices(server *Server) (map[string]ServiceGroup, error) {
 }
 
 func PostImeiOrder(server *Server, service int32, imei int64) (ApiResponse, error) {
-	if !isValidIMEI(imei) {
+	if !IsValidIMEI(imei) {
 		return ApiResponse{}, errors.New("invalid imei")
 	}
 	parameters := Parameters{
@@ -81,5 +81,14 @@ func PostImeiOrder(server *Server, service int32, imei int64) (ApiResponse, erro
 	if err != nil {
 		return ApiResponse{}, err
 	}
+	return apiResponse, nil
+}
+
+func PostBulkImeiOrder(server *Server, service int32, imei int64) (ApiResponse, error) {
+	apiResponse, err := dhruApiRequest(server, ActionPlaceOrder, Parameters{})
+	if err != nil {
+		return ApiResponse{}, err
+	}
+	fmt.Printf("")
 	return apiResponse, nil
 }
