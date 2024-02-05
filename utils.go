@@ -11,9 +11,9 @@ const (
 	ActionGetOrderBulk   Action = "getimeiorderbulk"
 )
 
-func IsValidIMEI[T any](imei *T) bool {
+func IsValidIMEI[T any](imei T) bool {
 	var imeiInt int64
-	if v, ok := (*imei).(string); ok {
+	if v, ok := imei.(string); ok {
 		imeiInt64, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
 			return false
