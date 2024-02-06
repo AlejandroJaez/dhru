@@ -7,8 +7,8 @@ import (
 
 var credentials = dhru.Server{
 	Url:       "https://fakedhru.alesoft.workers.dev/api/index.php",
-	Username:  "alejandrojaez",
-	SecretKey: "P89-M5G-FWX-3YS-YLH-MY-XDH-JXX",
+	Username:  "testuser",
+	SecretKey: "testkey",
 }
 
 func TestServices(t *testing.T) {
