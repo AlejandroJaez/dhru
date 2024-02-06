@@ -29,15 +29,15 @@ func TestAccountInfo(t *testing.T) {
 
 func TestPostImeiOrder(t *testing.T) {
 	t.Parallel()
-	_, err := dhru.PostImeiOrder(&credentials, 1, 309777379750368)
+	_, err := dhru.PostImeiOrder(&credentials, 1, 342424234243235)
 	if err != nil {
 		t.Fatalf("error: %s", err)
 	}
 }
 
 func BenchmarkIsValidIMEI(b *testing.B) {
-	imei := 309777379750368
+	imei := 342424234243235
 	for i := 0; i < b.N; i++ {
-		dhru.IsValidIMEI(imei)
+		dhru.IsValidIMEI(int64(imei))
 	}
 }

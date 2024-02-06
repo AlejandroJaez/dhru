@@ -20,7 +20,7 @@ type StringToFloat float64
 
 type DrhuAccount struct {
 	Credit    string
-	Creditraw StringToFloat
+	CreditRaw StringToFloat
 	Mail      string
 	Currency  string
 }
