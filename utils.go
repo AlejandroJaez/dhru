@@ -2,15 +2,6 @@ package dhru
 
 import "strconv"
 
-const (
-	ActionAccountInfo    Action = "accountinfo"
-	ActionServiceList    Action = "imeiservicelist"
-	ActionPlaceOrder     Action = "placeimeiorder"
-	ActionPlaceOrderBulk Action = "placeimeiorderbulk"
-	ActionGetOrder       Action = "getimeiorder"
-	ActionGetOrderBulk   Action = "getimeiorderbulk"
-)
-
 func IsValidIMEI[T string | int | int64](imei T) bool {
 	var imeiInt int64
 	if v, ok := any(imei).(string); ok {

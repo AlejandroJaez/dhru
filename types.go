@@ -7,6 +7,15 @@ import (
 	"strings"
 )
 
+const (
+	ActionAccountInfo    Action = "accountinfo"
+	ActionServiceList    Action = "imeiservicelist"
+	ActionPlaceOrder     Action = "placeimeiorder"
+	ActionPlaceOrderBulk Action = "placeimeiorderbulk"
+	ActionGetOrder       Action = "getimeiorder"
+	ActionGetOrderBulk   Action = "getimeiorderbulk"
+)
+
 type StringToFloat float64
 
 type DrhuAccount struct {
